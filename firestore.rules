@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidActivityProgress(data, userId) {
+      return data.userId == userId &&
+        data.activityId is string && data.activityId.size() <= 128 &&
+        data.moduleId is string && data.moduleId.size() <= 64 &&
+        data.moduleTitle is string && data.moduleTitle.size() <= 128 &&
+        data.week is int && data.week >= 1 && data.week <= 4 &&
+        data.day is int && data.day >= 1 && data.day <= 7 &&
+        data.category is string && data.category.size() <= 64 &&
+        data.activityTitle is string && data.activityTitle.size() <= 128 &&
+        data.completed is bool;
+    }
+
+    // User activity progress rules
+    match /users/{userId}/activityProgress/{activityId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+        isValidId(activityId) &&
+        isValidActivityProgress(request.resource.data, userId);
+      allow update: if isOwner(userId) &&
+        isValidId(activityId) &&
+        isValidActivityProgress(request.resource.data, userId) &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.activityId == resource.data.activityId;
+      allow delete: if isOwner(userId);
+    }
+  }
+}

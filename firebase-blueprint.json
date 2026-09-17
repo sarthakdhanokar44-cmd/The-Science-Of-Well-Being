@@ -1,0 +1,72 @@
+{
+  "entities": {
+    "ActivityProgress": {
+      "title": "ActivityProgress",
+      "description": "Stores completion state and metadata for a specific activity for a user",
+      "type": "object",
+      "properties": {
+        "activityId": {
+          "type": "string",
+          "description": "Deterministic ID of the activity (e.g., m1-d1-a1)"
+        },
+        "moduleId": {
+          "type": "string",
+          "description": "ID of the parent module (e.g., module1)"
+        },
+        "moduleTitle": {
+          "type": "string",
+          "description": "Display title of the module"
+        },
+        "week": {
+          "type": "number",
+          "description": "Week number from 1 to 4"
+        },
+        "day": {
+          "type": "number",
+          "description": "Day number from 1 to 7 within module"
+        },
+        "overallDay": {
+          "type": "number",
+          "description": "Overall program day from 1 to 28"
+        },
+        "category": {
+          "type": "string",
+          "description": "Activity category (e.g., Savoring, Gratitude)"
+        },
+        "activityTitle": {
+          "type": "string",
+          "description": "Title/name of the activity"
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the activity is marked complete"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Server timestamp of completion or last update"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner user"
+        }
+      },
+      "required": [
+        "activityId",
+        "moduleId",
+        "moduleTitle",
+        "week",
+        "day",
+        "category",
+        "activityTitle",
+        "completed",
+        "userId"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/activityProgress/{activityId}": {
+      "schema": "ActivityProgress",
+      "description": "Activity completion progress documents for each authenticated user"
+    }
+  }
+}
